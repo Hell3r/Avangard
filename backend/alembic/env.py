@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.database.database import Base
-from src.models import users
+from src.models import users, adresses, storage, tasks
 
 config = context.config
 
@@ -17,7 +17,6 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-print("Таблицы, которые видит Alembic:")
 for table in Base.metadata.tables.keys():
     print(f"  - {table}")
 
