@@ -6,8 +6,6 @@ import re
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50, description="Имя пользователя")
-    role: str = Field("common", description="Роль пользователя")
-    is_active: bool = Field(False, description="Активен ли пользователь")
     avatar_path: Optional[str] = Field("static/default_avatar.png", description="Путь к аватару")
     address_id: int = Field(..., description="ID адреса")
     completed_tasks: int = Field(0, description="Количество выполненных задач")
@@ -21,7 +19,6 @@ class UserBase(BaseModel):
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=6, description="Пароль пользователя")
-    role: Optional[str] = "common"
     address_id: int
 
 class UserUpdate(BaseModel):
@@ -47,6 +44,8 @@ class UserUpdate(BaseModel):
 
 class User(UserBase):
     id: int
+    role: str = "common"
+    is_active: bool = True
     last_login: Optional[datetime] = None
     created_at: Optional[datetime] = None 
     

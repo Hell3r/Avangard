@@ -13,6 +13,8 @@ class Base(DeclarativeBase):
     pass
 
 
+from src.models import *
+
 engine = create_async_engine(
     DATABASE_URL,
     echo=True, 
@@ -31,6 +33,3 @@ AsyncSessionLocal = async_sessionmaker(
 async def get_session():
     async with AsyncSessionLocal() as session:
         yield session
-
-
-from src.models import *

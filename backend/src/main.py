@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 import logging
 
+# Import models to register them with SQLAlchemy Base
+from src.models import UserModel, AddressModel, Task, StorageModel
+
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(
@@ -17,10 +20,11 @@ logging.getLogger('httpx').setLevel(logging.WARNING)
 app = FastAPI()
 app.include_router(main_router)
 
-# Public endpoints that don't require authorization
 PUBLIC_ENDPOINTS = {
     "/v1/users/login",
-    "/v1/users/user",  # registration
+    "/v1/users/user",
+    "/v1/addresses",
+    "/v1/addresses/{address_id}",
     "/v1/health",
     "/v1/health/db_check",
     "/v1/health/setup_db",
@@ -40,7 +44,6 @@ def custom_openapi():
         routes=app.routes,
     )
     
-    # Add OAuth2 password flow security scheme
     openapi_schema["components"]["securitySchemes"] = {
         "OAuth2PasswordBearer": {
             "type": "oauth2",
@@ -53,21 +56,20 @@ def custom_openapi():
         }
     }
     
-    # Apply security to all endpoints except public ones
+    
     for path in openapi_schema["paths"]:
-        # Check if path is public
+
         is_public = path in PUBLIC_ENDPOINTS or any(path.startswith(p.rstrip('/')) for p in PUBLIC_ENDPOINTS if p.endswith('/'))
         
-        # Also check exact match for base paths
         if path.rstrip('/') in {p.rstrip('/') for p in PUBLIC_ENDPOINTS}:
             is_public = True
             
         for method in openapi_schema["paths"][path]:
             if is_public:
-                # Remove security from public endpoints
+               
                 openapi_schema["paths"][path][method].pop("security", None)
             else:
-                # Add security to protected endpoints
+     
                 openapi_schema["paths"][path][method]["security"] = [{"OAuth2PasswordBearer": []}]
     
     app.openapi_schema = openapi_schema

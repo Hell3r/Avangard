@@ -88,13 +88,6 @@ async def create_user(
     session: SessionDep,
     user_data: UserCreate
 ):
-    """
-    Создание нового пользователя
-    
-    - **username**: уникальное имя пользователя
-    - **password**: пароль (минимум 6 символов)
-    - **role**: роль пользователя (опционально, по умолчанию "common")
-    """
     existing_user = await check_username_exists(user_data.username, session)
     if existing_user:
         raise HTTPException(
@@ -105,3 +98,18 @@ async def create_user(
     new_user = await service.create(user_data)
     
     return new_user
+
+
+@router.post("/logout", summary="Выход из системы")
+async def logout(
+    token: str = Depends(oauth2_scheme)
+):
+    await add_to_blacklist(token)
+    return {"message": "Успешный выход из системы"}
+
+
+@router.get("/me", response_model=User, summary="Получить текущего пользователя")
+async def get_current_user_info(
+    current_user: UserModel = Depends(get_current_user)
+):
+    return current_user
