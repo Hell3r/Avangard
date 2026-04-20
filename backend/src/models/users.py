@@ -20,9 +20,10 @@ class UserModel(Base):
     
     
     address: Mapped["AddressModel"] = relationship("AddressModel", back_populates="user")
-    assigned_tasks: Mapped[List["Task"]] = relationship("Task", foreign_keys="Task.assigned_by_id", back_populates="assigned_by")
-    my_tasks: Mapped[List["Task"]] = relationship("Task", foreign_keys="Task.assigned_to_id", back_populates="assigned_to")
+    assigned_tasks: Mapped[List["TaskModel"]] = relationship("TaskModel", foreign_keys="TaskModel.assigned_by_id", back_populates="assigned_by")
+    my_tasks: Mapped[List["TaskModel"]] = relationship("TaskModel", foreign_keys="TaskModel.assigned_to_id", back_populates="assigned_to")
     
     
     def __repr__(self) -> str:
         return f"User(id={self.id}, username='{self.username}' )"
+ 

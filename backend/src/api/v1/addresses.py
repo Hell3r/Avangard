@@ -3,7 +3,8 @@ from src.database.deps import SessionDep
 from src.schemas.addresses import Address, AddressCreate
 from src.dependencies.services import AddressServiceDep
 from typing import List
-
+from src.core.cache import cached
+from src.services.RedisService import redis_service
 
 router = APIRouter(prefix="/v1/addresses", tags=["Адреса"])
 
@@ -31,6 +32,7 @@ async def get_address(
 
 
 @router.get("", response_model=List[Address], summary="Получить все адреса")
+@cached(ttl = 300)
 async def get_addresses(
     service: AddressServiceDep,
     skip: int = 0,

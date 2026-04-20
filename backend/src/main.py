@@ -3,9 +3,12 @@ from src.api import main_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 import logging
+from src.services.RedisService import redis_service
+from dotenv import load_dotenv
+import os, asyncio
 
 # Import models to register them with SQLAlchemy Base
-from src.models import UserModel, AddressModel, Task, StorageModel
+from src.models import UserModel, AddressModel, TaskModel, StorageModel
 
 logger = logging.getLogger(__name__)
 
@@ -93,3 +96,37 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+async def initialize_redis():
+    try:
+        success = await redis_service.connect()
+        if success:
+            logger.info("✅ Redis successfully connected and cache enabled")
+            
+            test_result = await redis_service.set("health_check", {"status": "ok", "app": "Beatok"}, 60)
+            if test_result:
+                logger.info("✅ Redis cache test passed")
+            else:
+                logger.warning("⚠️ Redis cache test failed")
+        else:
+            logger.warning("⚠️ Redis connection failed - running without cache")
+    except Exception as e:
+        logger.warning(f"⚠️ Redis initialization error: {e} - running without cache")
+
+
+
+
+@app.on_event("startup")
+async def startup_event():
+    await initialize_redis()
+    logger.info(" Application started with background tasks")
+    
+    
+    
+    
+@app.on_event("shutdown") 
+async def shutdown_event():
+    await redis_service.disconnect()
+    logger.info(" Application shutdown")

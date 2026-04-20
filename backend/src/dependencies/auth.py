@@ -3,7 +3,7 @@ from typing_extensions import Annotated
 from src.database.deps import SessionDep
 from src.services.AuthService import (
     oauth2_scheme, get_current_user, get_password_hash,
-    check_username_exists, check_email_exists, authenticate_user
+    check_username_exists, authenticate_user
 )
 from src.models.users import UserModel
 
@@ -19,5 +19,12 @@ async def get_current_admin_user(current_user: CurrentUser) -> UserModel:
     if getattr(current_user, 'role', 'user') != 'admin':
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return current_user
+
+async def get_current_manager_or_admin_user(current_user: CurrentUser) -> UserModel:
+    if getattr(current_user, 'role', 'user') not in ['admin', 'manager']:
+        raise HTTPException(status_code=403, detail="Not enough permissions. Required: admin or manager")
+    return current_user
+
+ManagerOrAdminUser = Annotated[UserModel, Depends(get_current_manager_or_admin_user)]
 
 AdminUser = Annotated[UserModel, Depends(get_current_admin_user)]

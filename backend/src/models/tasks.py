@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from src.database.database import Base
 
-class Task(Base):
+class TaskModel(Base):
     __tablename__ = "tasks"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
