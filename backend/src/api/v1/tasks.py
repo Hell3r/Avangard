@@ -45,15 +45,22 @@ async def update_task(task_id: int, task_data: TaskUpdate, service: TaskServiceD
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена")
     return updated
 
+
 @router.post("/{task_id}/complete", response_model=Task, summary="Завершить задачу")
-async def complete_task(task_id: int, complete_data: TaskComplete, service: TaskServiceDep):
+async def complete_task(
+    task_id: int,
+    complete_data: TaskComplete,
+    service: TaskServiceDep,
+    current_user: ManagerOrAdminUser,
+):
     """
     Завершить задачу.
     """
-    completed = await service.complete(task_id, complete_data)
+    completed = await service.complete(task_id, complete_data, actor_user_id=current_user.id)
     if not completed:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена")
     return completed
+
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить задачу")
 async def delete_task(task_id: int, service: TaskServiceDep, current_user: ManagerOrAdminUser):

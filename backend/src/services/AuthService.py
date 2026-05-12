@@ -47,9 +47,9 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-
-async def authenticate_user(email: str, password: str, session: AsyncSession):
-    user = await get_user_by_email(email, session)
+    
+async def authenticate_user(username: str, password: str, session: AsyncSession):
+    user = await get_user_by_username(username, session)
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -57,10 +57,10 @@ async def authenticate_user(email: str, password: str, session: AsyncSession):
     return user
 
 
-async def get_user_by_email(email: str, session: AsyncSession):
+async def get_user_by_username(username: str, session: AsyncSession):
     from src.models.users import UserModel
     result = await session.execute(
-        select(UserModel).where(UserModel.username == email)
+        select(UserModel).where(UserModel.username == username)
     )
     return result.scalar_one_or_none()
 
@@ -96,7 +96,7 @@ async def get_current_user(
     except JWTError as e:
         raise credentials_exception from e
     
-    user = await get_user_by_email(token_data.username, session)
+    user = await get_user_by_username(token_data.username, session)
     if user is None:
         raise credentials_exception
     

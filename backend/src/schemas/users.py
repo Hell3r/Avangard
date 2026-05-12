@@ -1,14 +1,20 @@
+
 from pydantic import BaseModel, Field, validator
 from datetime import datetime, date
 from typing import Optional, List, ForwardRef
 import re
 
-
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50, description="Имя пользователя")
+    full_name: str = Field('', description="Полное имя пользователя")
+
     avatar_path: Optional[str] = Field("static/default_avatar.png", description="Путь к аватару")
     address_id: int = Field(..., description="ID адреса")
     completed_tasks: int = Field(0, description="Количество выполненных задач")
+    
+    # On-site fields
+    is_on_site: bool = Field(False, description="На объекте")
+    on_site_since: Optional[datetime] = Field(None, description="Время прибытия на объект")
     
     @validator('username')
     def validate_username(cls, v):
@@ -18,9 +24,11 @@ class UserBase(BaseModel):
 
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
+    full_name: str = Field('', description="Полное имя пользователя")
     password: str = Field(..., min_length=6, description="Пароль пользователя")
-    role: Optional[str] = None
+    role: str
     address_id: int
+
 
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=50)
@@ -30,6 +38,9 @@ class UserUpdate(BaseModel):
     avatar_path: Optional[str] = None
     address_id: Optional[int] = None
     completed_tasks: Optional[int] = None
+    
+    # On-site toggle
+    is_on_site: Optional[bool] = None
     
     @validator('password')
     def validate_password(cls, v):
@@ -45,15 +56,13 @@ class UserUpdate(BaseModel):
 
 class User(UserBase):
     id: int
-    role: str = "common"
+    role: str = "employee"
     is_active: bool = True
     last_login: Optional[datetime] = None
     created_at: Optional[datetime] = None 
     
     class Config:
         from_attributes = True
-
-
 
 class Token(BaseModel):
     access_token: str

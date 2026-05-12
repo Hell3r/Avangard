@@ -21,7 +21,7 @@ async def get_current_admin_user(current_user: CurrentUser) -> UserModel:
     return current_user
 
 async def get_current_manager_or_admin_user(current_user: CurrentUser) -> UserModel:
-    if getattr(current_user, 'role', 'user') not in ['admin', 'manager']:
+    if getattr(current_user, 'role', 'user') not in ['admin', 'master']:
         raise HTTPException(status_code=403, detail="Not enough permissions. Required: admin or manager")
     return current_user
 

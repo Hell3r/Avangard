@@ -9,7 +9,9 @@ class UserModel(Base):
     __tablename__ = "users"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(index = True)
+    username: Mapped[str] = mapped_column(index=True)
+    full_name: Mapped[str] = mapped_column(String(200), nullable=False, default='')
+
     password: Mapped[str] = mapped_column()
     role: Mapped[str] = mapped_column(default = "common", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
@@ -17,6 +19,8 @@ class UserModel(Base):
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     address_id: Mapped[int] = mapped_column(Integer, ForeignKey("addresses.id", ondelete="CASCADE"))
     completed_tasks: Mapped[int] = mapped_column(Integer)
+    is_on_site: Mapped[bool] = mapped_column(Boolean, default=False)
+    on_site_since: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     
     
     address: Mapped["AddressModel"] = relationship("AddressModel", back_populates="user")

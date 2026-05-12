@@ -86,7 +86,9 @@ origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
@@ -121,12 +123,18 @@ async def initialize_redis():
 @app.on_event("startup")
 async def startup_event():
     await initialize_redis()
-    logger.info(" Application started with background tasks")
-    
-    
-    
-    
-@app.on_event("shutdown") 
+
+    from src.database.deps import get_session
+    from src.services.TaskService import TaskService
+
+    asyncio.create_task(TaskService.overdue_updater_loop(get_session))
+
+    logger.info("Application started (overdue updater enabled)")
+
+
+@app.on_event("shutdown")
+
 async def shutdown_event():
     await redis_service.disconnect()
-    logger.info(" Application shutdown")
+    logger.info("Application shutdown")
+

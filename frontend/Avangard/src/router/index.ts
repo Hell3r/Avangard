@@ -1,32 +1,45 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import Login from '../views/Login.vue'
+import Dashboard from '../views/Dashboard.vue'
+import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      redirect: { name: 'login-page' }
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/Login.vue')
-    },
+
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('@/views/Dashboard.vue'),
-      beforeEnter: async (to, from) => {
-        const authStore = useAuthStore()
-        await authStore.initialize()
-        if (!authStore.user) {
-          return '/login'
-        }
-      }
+      component: Dashboard,
+      meta: { requiresAdmin: true }
+    },
+    // чтобы / всегда начинался с логина
+    {
+      path: '/login',
+      name: 'login-page',
+      component: Login
     }
   ]
+
 })
+
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+
+  if (to.meta?.requiresAdmin && (!auth.isAuthenticated || auth.user?.role !== 'admin')) {
+    return {
+      name: 'login',
+      query: { error: 'forbidden' }
+    }
+  }
+
+  return true
+ })
+
 
 export default router
 

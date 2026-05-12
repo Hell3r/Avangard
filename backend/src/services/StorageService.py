@@ -32,6 +32,7 @@ class StorageService:
         await self.session.refresh(db_storage)
         return db_storage
     
+    
     async def update(self, storage_id: int, storage_data: StorageUpdate) -> Optional[StorageModel]:
         storage = await self.get_by_id(storage_id)
         if not storage:
