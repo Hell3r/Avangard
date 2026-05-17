@@ -91,11 +91,14 @@ class UserService:
             user.is_on_site = False
             user.on_site_since = None
             event = f"{user.full_name} покинул объект"
+            event = f"site_left; user_id={user.id}; actor_user_id={user.id}; {event}"
         else:
             # Arrive site
             user.is_on_site = True
             user.on_site_since = datetime.utcnow()
             event = f"{user.full_name} прибыл на объект"
+            event = f"site_entered; user_id={user.id}; actor_user_id={user.id}; {event}"
+
 
         await self.session.commit()
         await self.session.refresh(user)

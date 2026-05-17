@@ -1,7 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
-from src.models.users import UserModel
+from datetime import datetime
+from typing import Optional
 from src.models.events_journal import EventJournalModel
+
+
 
 
 class EventJournalService:
@@ -16,16 +19,42 @@ class EventJournalService:
         return event
     
     
-    async def get_all_events(self, skip: int = 0, limit: int = 100, from_at: str = None, to_at: str = None):
-        result = await self.session.execute(
+    async def get_all_events(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        from_at: str = None,
+        to_at: str = None,
+    ):
+        def _parse_dt(value: Optional[str]):
+
+            if not value:
+                return None
+            try:
+                return datetime.fromisoformat(value)
+            except ValueError:
+                return datetime.fromisoformat(value + "T00:00:00")
+
+        parsed_from = _parse_dt(from_at)
+        parsed_to = _parse_dt(to_at)
+
+        conditions = []
+        if parsed_from is not None:
+            conditions.append(EventJournalModel.event_at >= parsed_from)
+        if parsed_to is not None:
+            conditions.append(EventJournalModel.event_at <= parsed_to)
+
+        stmt = (
             select(EventJournalModel)
             .offset(skip)
             .limit(limit)
             .order_by(EventJournalModel.event_at.desc())
-            .where(
-                and_(
-                    EventJournalModel.event_at >= from_at if from_at else True,
-                    EventJournalModel.event_at <= to_at if to_at else True))
         )
+
+        if conditions:
+            stmt = stmt.where(and_(*conditions))
+
+        result = await self.session.execute(stmt)
         return result.scalars().all()
+
 

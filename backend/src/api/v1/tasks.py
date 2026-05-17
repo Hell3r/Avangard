@@ -40,7 +40,8 @@ async def update_task(task_id: int, task_data: TaskUpdate, service: TaskServiceD
     """
     Обновить задачу. Только admin или manager.
     """
-    updated = await service.update(task_id, task_data)
+    updated = await service.update(task_id, task_data, actor_user_id=current_user.id)
+
     if not updated:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена")
     return updated

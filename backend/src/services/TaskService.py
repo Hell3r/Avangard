@@ -59,7 +59,7 @@ class TaskService:
 
 
 
-    async def update(self, task_id: int, task_data: TaskUpdate) -> Optional[TaskModel]:
+    async def update(self, task_id: int, task_data: TaskUpdate, actor_user_id: Optional[int] = None) -> Optional[TaskModel]:
         task = await self.get_by_id(task_id)
         if not task:
             return None
@@ -70,8 +70,13 @@ class TaskService:
 
         await self.session.commit()
         await self.session.refresh(task)
-        
+
+        await EventJournalService(self.session).log_event(
+            f"task_updated; task_id={task.id}; actor_user_id={actor_user_id}; assigned_to_id={task.assigned_to_id}; due_at={task.due_at}; status={task.status}"
+        )
+
         return task
+
 
     async def complete(
 

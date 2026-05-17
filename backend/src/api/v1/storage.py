@@ -34,14 +34,16 @@ async def create_storage(storage_data: StorageCreate, service: StorageServiceDep
     Создать новый материал на складе. Только admin.
     """
     await redis_service.delete_pattern("*storage:*")
-    return await service.create(storage_data)
+    return await service.create(storage_data, actor_user_id=current_admin.id)
+
 
 @router.put("/{storage_id}", response_model=Storage, summary="Обновить материал")
 async def update_storage(storage_id: int, storage_data: StorageUpdate, service: StorageServiceDep, current_admin: AdminUser):
     """
     Обновить существующий материал. Только admin.
     """
-    updated = await service.update(storage_id, storage_data)
+    updated = await service.update(storage_id, storage_data, actor_user_id=current_admin.id)
+
     if not updated:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Материал не найден")
     return updated
@@ -51,7 +53,8 @@ async def delete_storage(storage_id: int, service: StorageServiceDep, current_ad
     """
     Удалить материал по ID. Только admin.
     """
-    deleted = await service.delete(storage_id)
+    deleted = await service.delete(storage_id, actor_user_id=current_admin.id)
+
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Материал не найден")
 
