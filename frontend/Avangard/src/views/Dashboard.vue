@@ -35,6 +35,7 @@
           <WarehouseCard />
         </div>
 
+
         <div class="col-span-5">
           <TasksBoard />
         </div>

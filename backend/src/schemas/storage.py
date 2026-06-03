@@ -19,6 +19,12 @@ class StorageUpdate(BaseModel):
     remainder: Optional[int] = Field(None, ge=0)
 
 
+class StorageWithdraw(BaseModel):
+    storage_id: int
+    quantity: int = Field(..., gt=0, description="Количество к списанию со склада")
+    note: Optional[str] = Field(None, max_length=500)
+
+
 class Storage(StorageBase):
     id: int
 

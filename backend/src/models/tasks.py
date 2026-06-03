@@ -14,12 +14,8 @@ class TaskModel(Base):
 
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
-    # Срок сдачи
     due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    # Статус
-    # "В работе" | "Проверка" | "Выполнена" | "Просрочено"
-    # Просрочено ставится автоматически по due_at
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="В работе")
 
 

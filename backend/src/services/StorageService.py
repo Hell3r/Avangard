@@ -12,12 +12,36 @@ class StorageService:
 
     def __init__(self, session: AsyncSession):
         self.session = session
-    
+
     async def get_by_id(self, storage_id: int) -> Optional[StorageModel]:
         result = await self.session.execute(
             select(StorageModel).where(StorageModel.id == storage_id)
         )
         return result.scalar_one_or_none()
+
+    async def withdraw(self, *, storage_id: int, quantity: int, actor_user_id: Optional[int] = None, note: Optional[str] = None) -> Optional[StorageModel]:
+        """Списание со склада: уменьшает remainder и создает запись storage_withdrawals."""
+        from sqlalchemy import select
+        from src.models.storage import StorageModel
+        from src.models.withdrawals import StorageWithdrawalModel
+
+        storage = await self.get_by_id(storage_id)
+        if not storage:
+            return None
+
+        if quantity > storage.remainder:
+            raise ValueError("quantity_exceeds_remainder")
+
+        storage.remainder -= quantity
+        await self.session.commit()
+        await self.session.refresh(storage)
+
+        await EventJournalService(self.session).log_event(
+            f"Вывод со склада: идентификатор материала={storage_id}; количество={quantity}; описание={note}"
+        )
+
+        return storage
+
     
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[StorageModel]:
         result = await self.session.execute(

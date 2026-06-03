@@ -26,6 +26,8 @@ class UserModel(Base):
     address: Mapped["AddressModel"] = relationship("AddressModel", back_populates="user")
     assigned_tasks: Mapped[List["TaskModel"]] = relationship("TaskModel", foreign_keys="TaskModel.assigned_by_id", back_populates="assigned_by")
     my_tasks: Mapped[List["TaskModel"]] = relationship("TaskModel", foreign_keys="TaskModel.assigned_to_id", back_populates="assigned_to")
+    site_visits: Mapped[List["SiteVisitModel"]] = relationship("SiteVisitModel", back_populates="user")
+    withdrawals: Mapped[List["StorageWithdrawalModel"]] = relationship("StorageWithdrawalModel", back_populates="withdrawn_by")
     
     
     def __repr__(self) -> str:

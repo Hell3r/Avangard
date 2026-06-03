@@ -52,7 +52,7 @@ class TaskService:
         await self.session.refresh(db_task, attribute_names=["assigned_to"])
 
         await EventJournalService(self.session).log_event(
-            f"task_created; task_id={db_task.id}; actor_user_id={current_user_id}; assigned_to_id={db_task.assigned_to_id}; due_at={db_task.due_at}; status={db_task.status}"
+            f"Задача создана; срок выполнение={db_task.due_at}; статус={db_task.status}"
         )
 
         return db_task
@@ -72,7 +72,7 @@ class TaskService:
         await self.session.refresh(task)
 
         await EventJournalService(self.session).log_event(
-            f"task_updated; task_id={task.id}; actor_user_id={actor_user_id}; assigned_to_id={task.assigned_to_id}; due_at={task.due_at}; status={task.status}"
+            f"Задача обновлена; срок выполнение={task.due_at}; статус={task.status}"
         )
 
         return task
@@ -90,6 +90,7 @@ class TaskService:
             return None
 
         task.completed_at = complete_data.completed_at
+        task.status = "Выполнена"
         await self.session.commit()
         await self.session.refresh(task)
 

@@ -3,15 +3,9 @@
     <div class="flex justify-between mb-6">
       <h2 class="text-xl font-semibold">Задачи</h2>
 
-      <div class="flex gap-3 text-sm">
-        <span class="text-[#1F5D3A] font-semibold">В работе</span>
-        <span class="text-gray-400">Проверка</span>
-        <span class="text-gray-400">Выполнено</span>
-      </div>
     </div>
 
     <div class="space-y-4">
-      <!-- В работе -->
       <div class="border rounded-xl p-4">
         <div class="flex justify-between">
           <div class="font-semibold">В работе</div>
@@ -20,7 +14,7 @@
 
         <div class="mt-3 space-y-3">
           <button
-            v-for="t in activeTasks"
+            v-for="t in limitedActiveTasks"
             :key="t.id"
             class="w-full text-left border rounded-lg p-3 hover:bg-gray-50"
             @click="openTask(t)"
@@ -29,7 +23,8 @@
             <div class="text-sm text-gray-500">Сотрудник: {{ t.assigned_to?.full_name ?? '—' }}</div>
           </button>
 
-          <div v-if="!activeTasks.length" class="text-sm text-gray-500">Нет задач</div>
+          <div v-if="extraActiveCount > 0" class="text-sm text-gray-500">+ {{ extraActiveCount }} задач</div>
+          <div v-else-if="!activeTasks.length" class="text-sm text-gray-500">Нет задач</div>
         </div>
       </div>
 
@@ -42,7 +37,7 @@
 
         <div class="mt-3 space-y-3">
           <button
-            v-for="t in completedTasks"
+            v-for="t in limitedCompletedTasks"
             :key="t.id"
             class="w-full text-left border rounded-lg p-3 hover:bg-gray-50"
             @click="openTask(t)"
@@ -51,7 +46,8 @@
             <div class="text-sm text-gray-500">Подрядчик: {{ t.assigned_to?.full_name ?? '—' }}</div>
           </button>
 
-          <div v-if="!completedTasks.length" class="text-sm text-gray-500">Нет выполненных задач</div>
+          <div v-if="extraCompletedCount > 0" class="text-sm text-gray-500">+ {{ extraCompletedCount }} задач</div>
+          <div v-else-if="!completedTasks.length" class="text-sm text-gray-500">Нет выполненных задач</div>
         </div>
       </div>
     </div>
@@ -114,6 +110,14 @@ onMounted(async () => {
 
 const activeTasks = computed(() => tasksStore.tasks.filter(t => t.status == 'В работе'))
 const completedTasks = computed(() => tasksStore.tasks.filter(t => t.completed_at != null))
+
+// limited lists for display (max 3)
+const limitedActiveTasks = computed(() => activeTasks.value.slice(0, 3))
+const limitedCompletedTasks = computed(() => completedTasks.value.slice(0, 3))
+
+// extra counts
+const extraActiveCount = computed(() => Math.max(activeTasks.value.length - 3, 0))
+const extraCompletedCount = computed(() => Math.max(completedTasks.value.length - 3, 0))
 
 const selectedTask = ref<Task | null>(null)
 

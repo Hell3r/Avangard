@@ -12,6 +12,7 @@ class AddressModel(Base):
     name: Mapped[str] = mapped_column()
     
     user: Mapped["UserModel"] = relationship("UserModel", back_populates="address")
+    site_visits: Mapped[List["SiteVisitModel"]] = relationship("SiteVisitModel", back_populates="address")
     
     def __repr__(self) -> str:
         return f"Address(id={self.id}, name='{self.name}' )"

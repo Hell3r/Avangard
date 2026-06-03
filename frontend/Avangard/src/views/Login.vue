@@ -89,13 +89,21 @@ async function onSubmit() {
   try {
     await auth.login(username.value.trim(), password.value)
 
-    if (auth.user?.role !== 'admin') {
-      error.value = 'Доступ только для admin'
-      auth.logout()
-      return
+    if (auth.user?.role === 'admin') {
+      await router.push({ name: 'dashboard' })
+    }
+    else if (auth.user?.role === 'master') {
+      await router.push({ name: 'master' })
+    }
+    else if (auth.user?.role === 'employee') {
+      await router.push({ name: 'employee' })
+    }
+    else {
+      error.value = 'Недостаточно прав для доступа'
     }
 
-    await router.push({ name: 'dashboard' })
+
+
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Login failed'
   } finally {

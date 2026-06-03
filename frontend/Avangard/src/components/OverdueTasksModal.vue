@@ -89,9 +89,7 @@ function close() {
 }
 
 
-async function refreshTasks() {
-  await tasksStore.loadTasks()
-}
+// refreshTasks intentionally removed (unused)
 
 
 function openTask(t: Task) {

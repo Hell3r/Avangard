@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from src.schemas.tasks import Task, TaskCreate, TaskUpdate, TaskComplete
 from src.dependencies.services import TaskServiceDep
-from src.dependencies.auth import ManagerOrAdminUser
+from src.dependencies.auth import ManagerOrAdminUser, get_current_user, CurrentUser
 from src.database.deps import SessionDep
 from src.core.cache import cached
 from src.services.RedisService import redis_service
@@ -49,14 +49,11 @@ async def update_task(task_id: int, task_data: TaskUpdate, service: TaskServiceD
 
 @router.post("/{task_id}/complete", response_model=Task, summary="Завершить задачу")
 async def complete_task(
+    current_user: CurrentUser,
     task_id: int,
     complete_data: TaskComplete,
     service: TaskServiceDep,
-    current_user: ManagerOrAdminUser,
 ):
-    """
-    Завершить задачу.
-    """
     completed = await service.complete(task_id, complete_data, actor_user_id=current_user.id)
     if not completed:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена")

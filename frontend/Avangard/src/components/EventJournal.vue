@@ -15,7 +15,7 @@
         >
           <div
             class="w-3 h-3 rounded-full mt-2"
-            ]:class="idx === 0 ? 'bg-green-500' : idx === 1 ? 'bg-blue-500' : 'bg-yellow-500'"
+            :class="idx === 0 ? 'bg-green-500' : idx === 1 ? 'bg-[#1F5D3A]' : 'bg-yellow-500'"
           ></div>
 
           <div>

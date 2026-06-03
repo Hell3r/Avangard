@@ -43,9 +43,7 @@ export const useTasksStore = defineStore('tasks', {
 
         const res = await fetch('http://0.0.0.0:8000/v1/tasks/', {
           method: 'GET',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          }
+          headers: (token ? { Authorization: `Bearer ${token}` } : {})
         })
 
         if (!res.ok) {
@@ -62,7 +60,39 @@ export const useTasksStore = defineStore('tasks', {
       }
     },
 
+    async createTask(payload: {
+      description: string | null
+      assigned_to_id: number
+      due_at: string | null
+      status: string
+    }) {
+      const auth = useAuthStore()
+      const token = auth.accessToken
+
+      const res = await fetch('http://0.0.0.0:8000/v1/tasks/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          description: payload.description,
+          assigned_to_id: payload.assigned_to_id,
+          due_at: payload.due_at,
+          status: payload.status
+        })
+      })
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '')
+        throw new Error(`Failed to create task: ${res.status} ${text}`)
+      }
+
+      return (await res.json()) as Task
+    },
+
     async completeTask(taskId: number) {
+
       const auth = useAuthStore()
       const token = auth.accessToken
 

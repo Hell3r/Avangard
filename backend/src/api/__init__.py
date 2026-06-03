@@ -6,7 +6,7 @@ from src.api.v1.storage import router as storage_router
 from src.api.v1.tasks import router as task_router
 from src.api.v1.cache import router as cache_router
 from src.api.v1.events import router as events_router
-
+from src.api.v1.users_bind import router as users_bind_router
 
 
 main_router = APIRouter()
@@ -17,4 +17,6 @@ main_router.include_router(storage_router)
 main_router.include_router(task_router)
 main_router.include_router(cache_router)
 main_router.include_router(events_router)
+main_router.include_router(users_bind_router)
+
 

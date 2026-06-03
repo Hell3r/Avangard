@@ -4,11 +4,38 @@
       <div class="text-3xl font-bold mb-10">Авангард</div>
 
       <nav class="space-y-2">
-        <div class="bg-[#2E7D32] px-4 py-3 rounded-xl font-medium">Панель управления</div>
-        <div class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition">Объекты</div>
-        <div class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition">Склад</div>
-        <div class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition">Персонал</div>
-        <div class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition">Задачи</div>
+        <div
+          class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition cursor-pointer"
+          :class="{ 'bg-[#2E7D32]': isActive('dashboard') }"
+          @click="goToDashboard"
+        >
+          Панель управления
+        </div>
+
+        <div
+          class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition cursor-pointer"
+          :class="{ 'bg-[#2E7D32]': isActive('objects') }"
+          @click="goToObjects"
+        >
+          Объекты
+        </div>
+
+        <div
+          class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition cursor-pointer"
+          :class="{ 'bg-[#2E7D32]': isActive('warehouse') }"
+          @click="goToWarehouse"
+        >
+          Склад
+        </div>
+
+        <div
+          class="px-4 py-3 rounded-xl hover:bg-[#2E7D32] transition cursor-pointer"
+          :class="{ 'bg-[#2E7D32]': isActive('staff') }"
+          @click="goToStaff"
+        >
+          Персонал
+        </div>
+
       </nav>
     </div>
 
@@ -22,12 +49,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const authStore = useAuthStore()
 
+
 const authUserDisplayName = computed(() => {
-  
-  return (authStore.user as any)?.full_name ?? authStore.user?.username ?? '—'
+  const user = authStore.user as { full_name?: string | null; username?: string }
+  return user.full_name ?? user.username ?? '—'
 })
 
 const authRoleDisplay = computed(() => {
@@ -36,5 +68,28 @@ const authRoleDisplay = computed(() => {
   if (role === 'master') return 'Менеджер'
   return role ? role : 'Сотрудник'
 })
+
+function goToDashboard() {
+  router.push({ name: 'dashboard' })
+}
+
+function isActive(routeName: string) {
+  return route.name === routeName
+}
+
+function goToObjects() {
+  router.push({ name: 'objects' })
+}
+
+function goToWarehouse() {
+  router.push({ name: 'warehouse' })
+}
+
+function goToStaff() {
+  router.push({ name: 'staff' })
+}
+
 </script>
+
+
 

@@ -91,9 +91,8 @@ async function loadStaff() {
     // иначе -> /v1/users/on-site/all
     const isMaster = authStore.user?.role === 'master'
 
-    const onSiteUrl = isMaster
-      ? 'http://0.0.0.0:8000/v1/users/on-site?skip=0&limit=100'
-      : 'http://0.0.0.0:8000/v1/users/on-site/all?skip=0&limit=100'
+    // Use unified endpoint that returns all on‑site users regardless of role
+    const onSiteUrl = 'http://0.0.0.0:8000/v1/users/on-site/all?skip=0&limit=100'
 
     const onSite = await fetchWithAuth(onSiteUrl)
     onSiteUsers.value = onSite
@@ -114,4 +113,3 @@ onMounted(() => {
   loadStaff()
 })
 </script>
-

@@ -31,13 +31,13 @@ def cached(ttl: int = 300):
             
             cached_data = await redis_service.get(key)
             if cached_data is not None:
-                logger.info(f"🎯 КЕШ НАЙДЕН: {key}")
+                logger.info(f"КЕШ НАЙДЕН: {key}")
                 return cached_data
             
             result = await func(*args, **kwargs)
             
             await redis_service.set(key, result, ttl)
-            logger.info(f"💾 КЕШ СОХРАНЕН: {key}")
+            logger.info(f"КЕШ СОХРАНЕН: {key}")
             
             return result
         return wrapper

@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import { useStorageStore, type Storage } from '../stores/storage'
+import { useStorageStore } from '../stores/storage'
 
 const storageStore = useStorageStore()
 
